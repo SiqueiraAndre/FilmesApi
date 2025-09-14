@@ -1,6 +1,6 @@
 # FilmesApi
 
-API REST para cadastro, consulta, atualização e remoção de filmes, desenvolvida em .NET 6 com Entity Framework Core, MySQL e autenticação JWT.
+API REST para cadastro, consulta, atualização e remoção de filmes, desenvolvida em .NET 9 com Entity Framework Core, MySQL e autenticação JWT.
 
 ## Sumário
 
@@ -24,8 +24,8 @@ A FilmesApi é uma aplicação backend que permite gerenciar um catálogo de filmes.
 
 ## Tecnologias Utilizadas
 
-- .NET 6
-- C# 10
+- .NET 9
+- C# 13
 - Entity Framework Core
 - MySQL
 - AutoMapper
@@ -109,13 +109,13 @@ Authorization: Bearer {seu_token_aqui}
 ## Como Executar
 
 1. **Pré-requisitos**:
-   - .NET 6 SDK
+   - .NET 9 SDK
    - MySQL rodando localmente
 2. **Configuração**:
    - Ajuste a connection string em `appsettings.json` conforme seu ambiente.
    - Configure a chave secreta para o JWT em `appsettings.json`.
 3. **Migrações**:
-   - Execute `Update-Database` no Package Manager Console para criar as tabelas.
+   - Execute `dotnet ef database update` para criar as tabelas.
 4. **Execução**:
    - Rode o projeto via Visual Studio ou CLI: `dotnet run`
 
@@ -124,15 +124,30 @@ Authorization: Bearer {seu_token_aqui}
 - Utilize o Swagger para testar os endpoints via interface web.
 - Pode usar ferramentas como Postman ou Insomnia para requisições HTTP.
 
+### Testes Automatizados
+
+O projeto possui testes automatizados utilizando xUnit e Moq, localizados na pasta `FilmesApi.Tests`. Os testes cobrem os principais fluxos dos controllers de autenticação e filmes, incluindo:
+
+- Cadastro e login de usuários (AuthController)
+- Adição, consulta, atualização e remoção de filmes (FilmeController)
+
+Os testes utilizam banco de dados em memória para garantir isolamento e rapidez na execução.
+
+#### Como executar os testes
+
+No terminal, execute:
+   ```bash
+   dotnet test FilmesApi.Tests
+   ```
+
 ## Swagger
 
 A documentação dos endpoints está disponível automaticamente em `/swagger` quando a aplicação está em modo desenvolvimento.
 
 ## Observações
 
-- O projeto segue boas práticas de separação de responsabilidades e validação.
-- O uso de DTOs protege o modelo de domínio e facilita manutenção.
-- O código está pronto para evoluir, podendo incluir testes automatizados e outros recursos.
+- O projeto foi atualizado para .NET 9 e C# 13.
+- Certifique-se de que todos os pacotes NuGet estejam compatíveis com .NET 9.
 
 ---
 
