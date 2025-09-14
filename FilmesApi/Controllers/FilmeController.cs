@@ -4,11 +4,13 @@ using FilmesApi.Data.Dtos;
 using FilmesApi.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FilmesApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class FilmeController : ControllerBase
 {
     private FilmeContext _context;
