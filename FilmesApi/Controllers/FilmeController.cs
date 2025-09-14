@@ -2,6 +2,7 @@
 using FilmesApi.Data;
 using FilmesApi.Data.Dtos;
 using FilmesApi.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilmesApi.Controllers;
@@ -19,8 +20,16 @@ public class FilmeController : ControllerBase
         _mapper = mapper;
     }
 
+
+    /// <summary>
+    /// Adiciona um filme ao banco de dados
+    /// </summary>
+    /// <param name="filmeDto">Objeto com os campos necessários para criação de um filme</param>
+    /// <returns>IActionResult</returns>
+    /// <response code="201">Caso inserção seja feita com sucesso</response>
     [HttpPost]
-    public IActionResult AdicionarFilme([FromBody] CreateFilmeDto filmeDto)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public IActionResult AdicionaFilme([FromBody] CreateFilmeDto filmeDto)
     {
         Filme filme = _mapper.Map<Filme>(filmeDto);
         _context.Filmes.Add(filme);
@@ -28,17 +37,101 @@ public class FilmeController : ControllerBase
         return CreatedAtAction(nameof(RecuperaFilmePorId), new { id = filme.Id }, filme);
     }
 
+    /// <summary>
+    /// Recupera uma lista paginada de filmes do banco de dados
+    /// </summary>
+    /// <param name="skip">Quantidade de registros a serem ignorados</param>
+    /// <param name="take">Quantidade máxima de registros a serem retornados</param>
+    /// <returns>Lista de filmes</returns>
+    /// <response code="200">Retorna a lista de filmes</response>
     [HttpGet]
-    public IEnumerable<Filme> RecuperaFilmes([FromQuery]int skip = 0, [FromQuery]int take = 50)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IEnumerable<ReadeFilmeDto> RecuperaFilmes([FromQuery]int skip = 0, [FromQuery]int take = 50)
     {
-        return _context.Filmes.Skip(skip).Take(take);
+        return _mapper.Map<List<ReadeFilmeDto>>(_context.Filmes.Skip(skip).Take(take));
     }
 
+    /// <summary>
+    /// Recupera um filme pelo identificador
+    /// </summary>
+    /// <param name="id">Identificador do filme</param>
+    /// <returns>Filme encontrado</returns>
+    /// <response code="200">Retorna o filme encontrado</response>
+    /// <response code="404">Caso o filme não seja encontrado</response>
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult RecuperaFilmePorId(int id)
     {
         var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
         if (filme == null) return NotFound();
-        return Ok(filme);
+        var filmeDto = _mapper.Map<ReadeFilmeDto>(filme);
+        return Ok(filmeDto);
+    }
+
+    /// <summary>
+    /// Atualiza completamente um filme existente
+    /// </summary>
+    /// <param name="id">Identificador do filme</param>
+    /// <param name="filmeDto">Objeto com os campos para atualização</param>
+    /// <returns>IActionResult</returns>
+    /// <response code="204">Caso a atualização seja feita com sucesso</response>
+    /// <response code="404">Caso o filme não seja encontrado</response>
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult AtualizaFilme(int id, [FromBody] UpdateFilmeDto filmeDto)
+    {
+        var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+        if (filme == null) return NotFound();
+        _mapper.Map(filmeDto, filme);
+        _context.SaveChanges();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Atualiza parcialmente um filme existente
+    /// </summary>
+    /// <param name="id">Identificador do filme</param>
+    /// <param name="patch">Operações de atualização parcial</param>
+    /// <returns>IActionResult</returns>
+    /// <response code="204">Caso a atualização seja feita com sucesso</response>
+    /// <response code="404">Caso o filme não seja encontrado</response>
+    /// <response code="400">Caso os dados sejam inválidos</response>
+    [HttpPatch("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IActionResult AtualizaFilmeParcial(int id, JsonPatchDocument<UpdateFilmeDto> patch)
+    {
+        var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+        if (filme == null) return NotFound();
+
+        var filmeParaAtualizar = _mapper.Map<UpdateFilmeDto>(filme);
+        patch.ApplyTo(filmeParaAtualizar, ModelState);
+        
+        if (!TryValidateModel(filmeParaAtualizar)) return ValidationProblem(ModelState);
+        _mapper.Map(filmeParaAtualizar, filme);
+        _context.SaveChanges();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Remove um filme do banco de dados
+    /// </summary>
+    /// <param name="id">Identificador do filme</param>
+    /// <returns>IActionResult</returns>
+    /// <response code="204">Caso a remoção seja feita com sucesso</response>
+    /// <response code="404">Caso o filme não seja encontrado</response>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult DeletaFilme(int id)
+    {
+        var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+        if (filme == null) return NotFound();
+        _context.Remove(filme);
+        _context.SaveChanges();
+        return NoContent();
     }
 }
