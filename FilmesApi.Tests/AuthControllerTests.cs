@@ -21,7 +21,7 @@ public class AuthControllerTests
 
     private IConfiguration GetConfig()
     {
-        var inMemorySettings = new Dictionary<string, string> {
+        var inMemorySettings = new Dictionary<string, string?> {
             {"Jwt:Key", "test-key-test-key-test-key-test-key-test-key-test-key"},
             {"Jwt:Issuer", "FilmesApi"},
             {"Jwt:Audience", "FilmesApi"}
@@ -65,7 +65,8 @@ public class AuthControllerTests
 
         var result = controller.Login(new UsuarioDto { Username = "user", Password = "pass" });
         var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.Contains("Token", okResult.Value.ToString());
+        var value = okResult.Value?.ToString() ?? string.Empty;
+        Assert.Contains("Token", value);
     }
 
     [Fact]
