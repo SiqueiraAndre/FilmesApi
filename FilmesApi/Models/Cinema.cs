@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FilmesApi.Models;
 
 public class Cinema
 {
@@ -8,5 +9,7 @@ public class Cinema
     [Required(ErrorMessage = "O nome do cinema é obrigatório")]
     [MaxLength(100, ErrorMessage = "O nome do cinema não pode exceder 100 caracteres")]
     public string Nome { get; set; }
+    public int EnderecoId { get; set; }
+    public virtual Endereco Endereco { get; set; }
     
 }
