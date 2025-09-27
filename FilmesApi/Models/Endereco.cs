@@ -16,5 +16,5 @@ public class Endereco
     public string Complemento { get; set; }
     [Required(ErrorMessage = "O campo cidade é obrigatório")]
     public string Cidade { get; set; }
-    public virtual Cinema Cinema { get; set; }
+    public virtual Cinema? Cinema { get; set; }
 }

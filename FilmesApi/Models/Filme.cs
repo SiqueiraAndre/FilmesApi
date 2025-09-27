@@ -15,4 +15,5 @@ public class Filme
     public int Duracao { get; set; }
     public string? Diretor { get; set; }
     public string? Genero { get; set; }
+    public virtual ICollection<Sessao> Sessoes { get; set; }
 }

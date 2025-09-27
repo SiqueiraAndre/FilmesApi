@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<FilmeContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect
+    options.UseLazyLoadingProxies().UseMySql(connectionString, ServerVersion.AutoDetect
     (connectionString)));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
