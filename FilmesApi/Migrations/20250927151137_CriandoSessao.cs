@@ -18,10 +18,8 @@ namespace FilmesApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FilmeId = table.Column<int>(type: "int", nullable: false),
-                    CinemaId = table.Column<int>(type: "int", nullable: false),
-                    HorarioDeInicio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    HorarioDeEncerramento = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    FilmeId = table.Column<int>(type: "int", nullable: true),
+                    CinemaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

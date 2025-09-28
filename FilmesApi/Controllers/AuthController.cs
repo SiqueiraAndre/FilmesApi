@@ -45,7 +45,26 @@ public class AuthController : ControllerBase
         };
         _context.Usuarios.Add(usuario);
         _context.SaveChanges();
-        return Ok("Usuário registrado com sucesso.");
+
+        // Gera o token JWT para o usuário recém-registrado
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Name, usuario.Username)
+            }),
+            Expires = DateTime.UtcNow.AddHours(2),
+            Issuer = _configuration["Jwt:Issuer"],
+            Audience = _configuration["Jwt:Audience"],
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        return Ok(new { Token = tokenString });
     }
 
     /// <summary>

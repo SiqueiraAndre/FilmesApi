@@ -27,7 +27,9 @@ namespace FilmesApi.Controllers
             Sessao sessao = _mapper.Map<Sessao>(sessaoDto);
             _context.Sessoes.Add(sessao);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(RecuperaSessoesPorId), new { id = sessao.Id }, sessao);
+            return CreatedAtAction(nameof(RecuperaSessoesPorId), new 
+            { filmeID = sessao.FilmeId, cinemaId = sessao.CinemaId },
+            sessao);
         }
 
         [HttpGet]
@@ -36,10 +38,10 @@ namespace FilmesApi.Controllers
             return _mapper.Map<List<ReadSessaoDto>>(_context.Sessoes.Skip(skip).Take(take));
         }
 
-        [HttpGet("{id}")]
-        public IActionResult RecuperaSessoesPorId(int id)
+        [HttpGet("{filmeId}/{cinemaId}")]
+        public IActionResult RecuperaSessoesPorId(int filmeId, int cinemaId)
         {
-            Sessao sessao = _context.Sessoes.FirstOrDefault(sessao => sessao.Id == id);
+            Sessao sessao = _context.Sessoes.FirstOrDefault(sessao => sessao.FilmeId == filmeId && sessao.CinemaId == cinemaId);
             if (sessao == null)
             {
                 return NotFound();
@@ -49,20 +51,20 @@ namespace FilmesApi.Controllers
             return Ok(sessaoDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult AtualizaSessao(int id, [FromBody] UpdateSessaoDto sessaoDto)
+        [HttpPut("{filmeId}/{cinemaId}")]
+        public IActionResult AtualizaSessao(int filmeId, int cinemaId, [FromBody] UpdateSessaoDto sessaoDto)
         {
-            var sessao = _context.Sessoes.FirstOrDefault(sessao => sessao.Id == id);
+            Sessao sessao = _context.Sessoes.FirstOrDefault(sessao => sessao.FilmeId == filmeId && sessao.CinemaId == cinemaId);
             if (sessao == null) return NotFound();
             _mapper.Map(sessaoDto, sessao);
             _context.SaveChanges();
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeletaSessao(int id)
+        [HttpDelete("{filmeId}/{cinemaId}")]
+        public IActionResult DeletaSessao(int filmeId, int cinemaId)
         {
-            var sessao = _context.Sessoes.FirstOrDefault(sessao => sessao.Id == id);
+            Sessao sessao = _context.Sessoes.FirstOrDefault(sessao => sessao.FilmeId == filmeId && sessao.CinemaId == cinemaId);
             if (sessao == null) return NotFound();
             _context.Remove(sessao);
             _context.SaveChanges();
